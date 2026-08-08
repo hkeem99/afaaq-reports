@@ -1,0 +1,1016 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  width: 100%;
+  min-width: 100%;
+  min-height: 100%;
+}
+
+html,
+body {
+  overflow-x: hidden;
+}
+
+#root {
+  width: 100%;
+}
+
+.app-shell {
+  width: 100%;
+  min-width: 100%;
+}
+
+body {
+  font-family: Arial, "Segoe UI", Tahoma, sans-serif;
+  background: #f3f5f8;
+  color: #20242b;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+:root {
+  --afaaq-burgundy: #8b2035;
+  --afaaq-burgundy-dark: #671628;
+  --afaaq-burgundy-soft: #f8f0f2;
+  --afaaq-blue-gray: #617086;
+  --afaaq-dark: #252b35;
+  --afaaq-border: #dde2e8;
+  --afaaq-light: #f7f8fa;
+}
+
+/* =========================
+   الهيكل العام
+========================= */
+
+.app-shell {
+  min-height: 100vh;
+  padding: 28px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-card {
+  width: min(100%, 1080px);
+  background: #fff;
+  border: 1px solid #e4e7ec;
+  border-radius: 26px;
+  padding: 34px;
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.08);
+}
+
+.report-page {
+  align-self: flex-start;
+}
+
+.logos-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  flex-wrap: wrap;
+  margin-bottom: 26px;
+}
+
+.brand-logo {
+  display: block;
+  object-fit: contain;
+}
+
+.afaaq-logo,
+.bunyan-logo {
+  width: 145px;
+  max-height: 145px;
+}
+
+.intro {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.intro h1 {
+  margin: 0 0 8px;
+  font-size: clamp(2rem, 4vw, 3rem);
+  color: var(--afaaq-burgundy);
+  line-height: 1.2;
+}
+
+.intro p {
+  margin: 0;
+  color: var(--afaaq-blue-gray);
+  font-size: clamp(1rem, 2vw, 1.15rem);
+}
+
+/* =========================
+   الصفحة الرئيسية
+========================= */
+
+.report-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.report-card {
+  min-height: 185px;
+  padding: 24px 18px;
+  background: #fff;
+  border: 1px solid #e0e5eb;
+  border-radius: 22px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.report-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--afaaq-burgundy);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.09);
+}
+
+.report-icon {
+  font-size: 2.2rem;
+}
+
+.report-card strong {
+  color: var(--afaaq-burgundy);
+  font-size: 1.2rem;
+}
+
+.report-card small {
+  color: var(--afaaq-blue-gray);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* =========================
+   الأزرار
+========================= */
+
+.back-button {
+  display: block;
+  margin: 0 auto 18px;
+  border: 0;
+  border-radius: 999px;
+  background: #242424;
+  color: #fff;
+  padding: 10px 24px;
+  cursor: pointer;
+}
+
+.preview-button {
+  min-width: 190px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--afaaq-burgundy);
+  color: #fff;
+  padding: 13px 24px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.preview-button:hover {
+  background: var(--afaaq-burgundy-dark);
+  transform: translateY(-1px);
+}
+
+/* =========================
+   نموذج الإدخال
+========================= */
+
+.report-form {
+  width: min(100%, 860px);
+  margin: 0 auto;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-field-wide {
+  grid-column: 1 / -1;
+}
+
+.form-field label {
+  font-weight: 700;
+  color: #374151;
+  font-size: 0.98rem;
+}
+
+.optional-text {
+  font-weight: 400;
+  color: #8b95a5;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  border: 1px solid #d6dce5;
+  border-radius: 14px;
+  background: #fff;
+  color: #20242b;
+  padding: 13px 14px;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.form-field input,
+.form-field select {
+  min-height: 50px;
+}
+
+.form-field textarea {
+  min-height: 120px;
+  resize: vertical;
+  line-height: 1.7;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  border-color: var(--afaaq-burgundy);
+  box-shadow: 0 0 0 3px rgba(139, 32, 53, 0.1);
+}
+
+.form-field input::placeholder,
+.form-field textarea::placeholder {
+  color: #9aa3b2;
+}
+
+.form-field input[type="file"] {
+  padding: 10px;
+  background: #fafafa;
+}
+
+.field-hint {
+  color: #7c8796;
+  font-size: 0.88rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 28px;
+}
+
+/* =========================
+   التقرير الأسبوعي - الإدخال
+========================= */
+
+.weekly-section {
+  margin-top: 28px;
+}
+
+.weekly-section-title {
+  margin: 0 0 18px;
+  text-align: center;
+  color: var(--afaaq-dark);
+}
+
+.weekly-activity-card {
+  border: 1px solid var(--afaaq-border);
+  border-radius: 18px;
+  padding: 20px;
+  margin-bottom: 18px;
+  background: #fcfcfd;
+}
+
+.weekly-activity-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.weekly-activity-header strong {
+  color: var(--afaaq-burgundy);
+  font-size: 1.05rem;
+}
+
+.remove-activity-button,
+.add-activity-button {
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  padding: 9px 18px;
+}
+
+.remove-activity-button {
+  background: #eee;
+  color: #333;
+}
+
+.add-activity-button {
+  display: block;
+  margin: 8px auto 24px;
+  background: var(--afaaq-burgundy-soft);
+  color: var(--afaaq-burgundy-dark);
+  font-weight: 700;
+}
+
+.weekly-totals {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin: 24px 0 28px;
+}
+
+.weekly-total-card {
+  border: 1px solid var(--afaaq-border);
+  border-radius: 16px;
+  padding: 18px 12px;
+  text-align: center;
+  background: #fff;
+}
+
+.weekly-total-card strong {
+  display: block;
+  color: var(--afaaq-burgundy);
+  font-size: 1.7rem;
+  margin-bottom: 5px;
+}
+
+.weekly-total-card span {
+  color: var(--afaaq-blue-gray);
+}
+
+/* =========================
+   المعاينة الاحترافية
+========================= */
+
+.preview-content {
+  width: min(100%, 920px);
+  margin: 0 auto;
+  position: relative;
+}
+
+.preview-content::before {
+  content: "";
+  display: block;
+  height: 7px;
+  width: 100%;
+  border-radius: 20px 20px 0 0;
+  background: linear-gradient(
+    90deg,
+    var(--afaaq-burgundy-dark),
+    var(--afaaq-burgundy),
+    #76849a
+  );
+  margin-bottom: 20px;
+}
+
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--afaaq-border);
+  border: 1px solid var(--afaaq-border);
+  border-radius: 18px;
+  overflow: hidden;
+  margin-bottom: 28px;
+}
+
+.preview-item {
+  min-height: 95px;
+  background: #fff;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: center;
+}
+
+.preview-item strong {
+  color: var(--afaaq-burgundy);
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.preview-item span {
+  color: var(--afaaq-dark);
+  font-size: 1.05rem;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.preview-wide {
+  grid-column: 1 / -1;
+}
+
+.preview-wide:nth-last-child(-n + 3) {
+  background: #fcfcfd;
+}
+
+/* =========================
+   عناوين أقسام الأسبوعي
+========================= */
+
+.weekly-preview-section-title {
+  margin: 28px 0 18px;
+  padding: 14px 18px;
+  background: #941e35;
+  border-radius: 10px;
+}
+
+.weekly-preview-section-title h2 {
+  margin: 0;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+/* =========================
+   الصور والشواهد
+========================= */
+
+.preview-images-section {
+  margin-top: 32px;
+  padding-top: 4px;
+}
+
+.preview-images-section h2 {
+  margin: 0 0 18px;
+  padding: 13px 18px;
+  border-radius: 12px;
+  background: var(--afaaq-burgundy);
+  color: #fff;
+  font-size: 1.15rem;
+  text-align: right;
+}
+
+.preview-images {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.preview-images img {
+  width: 100%;
+  height: 280px;
+  display: block;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid #e0e4e9;
+  background: #f5f5f5;
+}
+
+.preview-images img:only-child {
+  grid-column: 1 / -1;
+  width: min(100%, 680px);
+  height: auto;
+  max-height: 520px;
+  object-fit: contain;
+  margin: 0 auto;
+}
+
+/* =========================
+   نهاية التقرير
+========================= */
+
+.preview-content::after {
+  content: "مشروع آفاق للتعريف بالإسلام باللغة البرتغالية";
+  display: block;
+  text-align: center;
+  margin-top: 28px;
+  padding-top: 16px;
+  border-top: 1px solid var(--afaaq-border);
+  color: #778293;
+  font-size: 0.86rem;
+}
+
+.preview-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 32px;
+}
+
+.preview-actions .back-button {
+  margin: 0;
+  min-width: 170px;
+  border-radius: 14px;
+  padding: 13px 24px;
+}
+
+.preview-actions .preview-button {
+  min-width: 170px;
+}
+
+/* =========================
+   الآيباد والشاشات المتوسطة
+========================= */
+
+@media (max-width: 900px) {
+  .app-shell {
+    padding: 20px 14px;
+    align-items: flex-start;
+  }
+
+  .home-card {
+    padding: 28px 22px;
+    border-radius: 22px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-field-wide {
+    grid-column: auto;
+  }
+
+  .report-options {
+    grid-template-columns: 1fr;
+  }
+
+  .report-card {
+    min-height: 135px;
+  }
+
+  .afaaq-logo,
+  .bunyan-logo {
+    width: 125px;
+    max-height: 125px;
+  }
+
+  .weekly-totals {
+    grid-template-columns: 1fr;
+  }
+
+  .preview-images img {
+    height: 240px;
+  }
+}
+
+/* =========================
+   الجوال
+========================= */
+
+@media (max-width: 520px) {
+  .app-shell {
+    padding: 12px 8px;
+  }
+
+  .home-card {
+    padding: 22px 14px;
+    border-radius: 18px;
+  }
+
+  .logos-row {
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .afaaq-logo,
+  .bunyan-logo {
+    width: 104px;
+    max-height: 104px;
+  }
+
+  .intro {
+    margin-bottom: 22px;
+  }
+
+  .intro h1 {
+    font-size: 2rem;
+  }
+
+  .form-grid {
+    gap: 14px;
+  }
+
+  .form-field input,
+  .form-field select,
+  .form-field textarea {
+    font-size: 16px;
+    border-radius: 12px;
+    padding: 12px;
+  }
+
+  .form-field input,
+  .form-field select {
+    min-height: 48px;
+  }
+
+  .form-field textarea {
+    min-height: 110px;
+  }
+
+  .preview-button {
+    width: 100%;
+  }
+
+  .back-button {
+    margin-bottom: 16px;
+  }
+
+  .weekly-activity-card {
+    padding: 14px;
+  }
+
+  .weekly-activity-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .preview-content::before {
+    margin-bottom: 14px;
+    height: 5px;
+  }
+
+  .preview-grid {
+    grid-template-columns: 1fr;
+    border-radius: 14px;
+  }
+
+  .preview-wide {
+    grid-column: auto;
+  }
+
+  .preview-item {
+    min-height: auto;
+    padding: 15px 14px;
+  }
+
+  .preview-item strong {
+    font-size: 0.88rem;
+  }
+
+  .preview-item span {
+    font-size: 1rem;
+  }
+
+  .weekly-preview-section-title {
+    margin: 20px 0 14px;
+    padding: 12px 14px;
+  }
+
+  .weekly-preview-section-title h2 {
+    font-size: 1.05rem;
+  }
+
+  .preview-images-section {
+    margin-top: 24px;
+  }
+
+  .preview-images {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .preview-images img,
+  .preview-images img:only-child {
+    width: 100%;
+    height: auto;
+    max-height: 420px;
+    object-fit: contain;
+    border-radius: 12px;
+  }
+
+  .preview-actions {
+    flex-direction: column;
+  }
+
+  .preview-actions .back-button,
+  .preview-actions .preview-button {
+    width: 100%;
+  }
+
+  .preview-content::after {
+    line-height: 1.7;
+  }
+}
+
+/* =========================
+   إعدادات الطباعة و PDF
+========================= */
+
+@page {
+  size: A4;
+  margin: 7mm;
+}
+
+@media print {
+  html,
+  body,
+  #root {
+    width: 100%;
+    min-height: auto;
+    margin: 0;
+    padding: 0;
+    background: #fff !important;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .preview-shell {
+    display: block;
+    min-height: auto;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+
+  .printable-report {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: #fff !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  /* =========================
+     الترويسة
+  ========================= */
+
+  .logos-row {
+    margin: 0 0 2.5mm !important;
+    gap: 8mm !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .afaaq-logo,
+  .bunyan-logo {
+    width: 18mm !important;
+    max-height: 18mm !important;
+  }
+
+  .intro {
+    margin-bottom: 2.5mm !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .intro h1 {
+    font-size: 16pt !important;
+    line-height: 1.1 !important;
+    margin: 0 !important;
+    color: #8b2035 !important;
+  }
+
+  .intro p {
+    display: none !important;
+  }
+
+  .preview-content {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+  }
+
+  .preview-content::before {
+    height: 1.2mm !important;
+    margin-bottom: 2mm !important;
+  }
+
+  /* =========================
+     جداول المعاينة العامة
+  ========================= */
+
+  .preview-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0 !important;
+    margin: 0 0 2.5mm !important;
+    border: 0.2mm solid #d7dce3 !important;
+    border-radius: 1.8mm !important;
+    overflow: visible !important;
+    background: #d7dce3 !important;
+  }
+
+  .preview-item {
+    min-height: 8.5mm !important;
+    padding: 1.5mm 2.5mm !important;
+    gap: 0.4mm !important;
+    background: #fff !important;
+    border: 0.1mm solid #e2e5e9 !important;
+
+    break-inside: avoid-page !important;
+    page-break-inside: avoid !important;
+    -webkit-column-break-inside: avoid !important;
+  }
+
+  .preview-item strong {
+    font-size: 6.8pt !important;
+    line-height: 1.1 !important;
+    color: #8b2035 !important;
+  }
+
+  .preview-item span {
+    font-size: 7.6pt !important;
+    line-height: 1.22 !important;
+    color: #20242b !important;
+  }
+
+  .preview-wide {
+    grid-column: 1 / -1 !important;
+  }
+
+  .preview-wide:nth-last-child(-n + 3) {
+    min-height: 9mm !important;
+    padding-top: 1.6mm !important;
+    padding-bottom: 1.6mm !important;
+  }
+
+  /* =========================
+     عناوين التقرير الأسبوعي
+  ========================= */
+
+  .weekly-preview-section-title {
+    margin: 2.5mm 0 2mm !important;
+    padding: 1.8mm 3mm !important;
+    border-radius: 1.5mm !important;
+    background: #8b2035 !important;
+
+    break-inside: avoid-page !important;
+    page-break-inside: avoid !important;
+    break-after: avoid-page !important;
+    page-break-after: avoid !important;
+  }
+
+  .weekly-preview-section-title h2 {
+    margin: 0 !important;
+    color: #fff !important;
+    font-size: 8.5pt !important;
+    line-height: 1.1 !important;
+  }
+
+  /* =====================================================
+     مهم جدًا:
+     قائمة الأنشطة الأسبوعية عند الطباعة
+
+     هذا هو التعديل الذي يمنع Safari
+     من تقسيم النشاط الواحد بين صفحتين.
+  ===================================================== */
+
+  .preview-content
+    > .weekly-preview-section-title:nth-of-type(4)
+    + .preview-grid {
+    display: block !important;
+    background: transparent !important;
+    border: 0.2mm solid #d7dce3 !important;
+    border-radius: 1.8mm !important;
+    overflow: visible !important;
+  }
+
+  .preview-content
+    > .weekly-preview-section-title:nth-of-type(4)
+    + .preview-grid
+    > .preview-item {
+    display: flex !important;
+    width: 100% !important;
+    min-height: auto !important;
+    margin: 0 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-top: 0 !important;
+    border-bottom: 0.2mm solid #dfe3e8 !important;
+    padding: 2mm 3mm !important;
+
+    break-inside: avoid-page !important;
+    page-break-inside: avoid !important;
+    -webkit-column-break-inside: avoid !important;
+  }
+
+  .preview-content
+    > .weekly-preview-section-title:nth-of-type(4)
+    + .preview-grid
+    > .preview-item:last-child {
+    border-bottom: 0 !important;
+  }
+
+  /*
+    عند عدم وجود مساحة كافية في نهاية الصفحة،
+    ينتقل النشاط كاملًا إلى الصفحة التالية.
+  */
+
+  .preview-content
+    > .weekly-preview-section-title:nth-of-type(4)
+    + .preview-grid
+    > .preview-item
+    > strong,
+  .preview-content
+    > .weekly-preview-section-title:nth-of-type(4)
+    + .preview-grid
+    > .preview-item
+    > span {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* =========================
+     الصور
+  ========================= */
+
+  .preview-images-section {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+
+    break-before: page !important;
+    page-break-before: always !important;
+  }
+
+  .preview-images-section h2 {
+    margin: 0 0 3mm !important;
+    padding: 2.3mm 3mm !important;
+    border-radius: 1.8mm !important;
+    font-size: 10pt !important;
+    background: #8b2035 !important;
+    color: #fff !important;
+
+    break-after: avoid-page !important;
+    page-break-after: avoid !important;
+  }
+
+  .preview-images {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 3mm !important;
+    align-items: start !important;
+  }
+
+  .preview-images img,
+  .preview-images img:only-child {
+    width: 100% !important;
+    height: 60mm !important;
+    max-height: 60mm !important;
+    margin: 0 !important;
+    object-fit: cover !important;
+    border-radius: 1.8mm !important;
+    border: 0.2mm solid #dfe3e8 !important;
+    background: #f5f5f5 !important;
+
+    break-inside: avoid-page !important;
+    page-break-inside: avoid !important;
+  }
+
+  .preview-images img:only-child {
+    grid-column: 1 / -1 !important;
+    width: 74% !important;
+    height: auto !important;
+    max-height: 150mm !important;
+    object-fit: contain !important;
+    margin: 0 auto !important;
+  }
+
+  /* =========================
+     تذييل التقرير
+  ========================= */
+
+  .preview-content::after {
+    margin-top: 3mm !important;
+    padding-top: 2mm !important;
+    border-top: 0.2mm solid #d9dde3 !important;
+    font-size: 6.8pt !important;
+    color: #778293 !important;
+
+    break-inside: avoid-page !important;
+    page-break-inside: avoid !important;
+  }
+}
