@@ -14,6 +14,7 @@ const LAST_ACTIVITY_KEY = 'afaaq-last-activity'
 
 const REPORT_STORAGE_KEYS = [
   'afaaq-activity-form',
+  'afaaq-activity-activities',
   'afaaq-weekly-form',
   'afaaq-weekly-activities',
   'afaaq-monthly-form',
@@ -37,12 +38,6 @@ const prepareTemporaryStorage = () => {
     REPORT_STORAGE_KEYS.some(
       (key) => localStorage.getItem(key) !== null
     )
-
-  /*
-    إذا كانت هناك بيانات محفوظة من النسخة السابقة
-    ولم يكن يوجد وقت مسجل لها، نعطيها مهلة
-    6 ساعات ابتداءً من أول فتح بعد هذا التحديث.
-  */
 
   if (!lastActivity) {
     if (hasSavedReportData) {
@@ -69,11 +64,6 @@ const touchStorageActivity = () => {
     String(Date.now())
   )
 }
-
-/*
-  يتم الفحص قبل إنشاء حالات React،
-  حتى إذا انتهت المهلة يبدأ التطبيق نظيفًا.
-*/
 
 prepareTemporaryStorage()
 
@@ -105,10 +95,24 @@ const beneficiaryTypes = [
    القيم الافتراضية
 ===================================================== */
 
+/*
+  البيانات العامة المشتركة
+  لجميع أنشطة اليوم
+*/
+
 const emptyActivityForm = {
   preacherName: '',
   country: '',
   activityDate: '',
+  notes: '',
+}
+
+/*
+  بيانات النشاط الواحد
+  داخل تقرير النشاط الدعوي
+*/
+
+const emptyDailyActivity = {
   program: '',
   activityTitle: '',
   activityPlace: '',
@@ -117,7 +121,6 @@ const emptyActivityForm = {
   newMuslimsCount: '0',
   description: '',
   results: '',
-  notes: '',
 }
 
 const emptyWeeklyActivity = {
@@ -182,7 +185,18 @@ function App() {
 
     if (saved) {
       try {
-        return JSON.parse(saved)
+        const parsed = JSON.parse(saved)
+
+        return {
+          preacherName:
+            parsed.preacherName || '',
+          country:
+            parsed.country || '',
+          activityDate:
+            parsed.activityDate || '',
+          notes:
+            parsed.notes || '',
+        }
       } catch {
         return emptyActivityForm
       }
@@ -190,6 +204,82 @@ function App() {
 
     return emptyActivityForm
   })
+
+  const [activityActivities, setActivityActivities] =
+    useState(() => {
+      const savedActivities =
+        localStorage.getItem(
+          'afaaq-activity-activities'
+        )
+
+      if (savedActivities) {
+        try {
+          const parsed =
+            JSON.parse(savedActivities)
+
+          return parsed.length
+            ? parsed
+            : [{ ...emptyDailyActivity }]
+        } catch {
+          return [{ ...emptyDailyActivity }]
+        }
+      }
+
+      /*
+        تحويل بيانات النشاط الواحد
+        من النسخة السابقة تلقائيًا
+        إلى النشاط رقم 1
+      */
+
+      const oldSavedForm =
+        localStorage.getItem(
+          'afaaq-activity-form'
+        )
+
+      if (oldSavedForm) {
+        try {
+          const oldData =
+            JSON.parse(oldSavedForm)
+
+          const hasOldActivityData =
+            oldData.program ||
+            oldData.activityTitle ||
+            oldData.activityPlace ||
+            oldData.beneficiaryType ||
+            Number(oldData.beneficiaryCount) > 0 ||
+            Number(oldData.newMuslimsCount) > 0 ||
+            oldData.description ||
+            oldData.results
+
+          if (hasOldActivityData) {
+            return [
+              {
+                program:
+                  oldData.program || '',
+                activityTitle:
+                  oldData.activityTitle || '',
+                activityPlace:
+                  oldData.activityPlace || '',
+                beneficiaryType:
+                  oldData.beneficiaryType || '',
+                beneficiaryCount:
+                  oldData.beneficiaryCount || '0',
+                newMuslimsCount:
+                  oldData.newMuslimsCount || '0',
+                description:
+                  oldData.description || '',
+                results:
+                  oldData.results || '',
+              },
+            ]
+          }
+        } catch {
+          // نبدأ بنشاط فارغ
+        }
+      }
+
+      return [{ ...emptyDailyActivity }]
+    })
 
   /* =====================================================
      التقرير الأسبوعي
@@ -258,7 +348,8 @@ function App() {
   ===================================================== */
 
   const [images, setImages] = useState([])
-  const [weeklyImages, setWeeklyImages] = useState([])
+  const [weeklyImages, setWeeklyImages] =
+    useState([])
   const [monthlyImages, setMonthlyImages] =
     useState([])
 
@@ -283,6 +374,13 @@ function App() {
       JSON.stringify(formData)
     )
   }, [formData])
+
+  useEffect(() => {
+    localStorage.setItem(
+      'afaaq-activity-activities',
+      JSON.stringify(activityActivities)
+    )
+  }, [activityActivities])
 
   /* =====================================================
      حفظ التقرير الأسبوعي
@@ -341,6 +439,50 @@ function App() {
     }))
   }
 
+  const handleActivityChange = (
+    index,
+    field,
+    value
+  ) => {
+    touchStorageActivity()
+
+    setActivityActivities((previous) =>
+      previous.map(
+        (activity, activityIndex) =>
+          activityIndex === index
+            ? {
+                ...activity,
+                [field]: value,
+              }
+            : activity
+      )
+    )
+  }
+
+  const addActivity = () => {
+    touchStorageActivity()
+
+    setActivityActivities((previous) => [
+      ...previous,
+      { ...emptyDailyActivity },
+    ])
+  }
+
+  const removeActivity = (index) => {
+    if (activityActivities.length === 1) {
+      return
+    }
+
+    touchStorageActivity()
+
+    setActivityActivities((previous) =>
+      previous.filter(
+        (_, activityIndex) =>
+          activityIndex !== index
+      )
+    )
+  }
+
   const handleImages = (event) => {
     const files = Array.from(
       event.target.files || []
@@ -355,6 +497,26 @@ function App() {
 
     setImages(selectedImages)
   }
+
+  const activityTotals =
+    activityActivities.reduce(
+      (totals, activity) => {
+        totals.activities += 1
+
+        totals.beneficiaries +=
+          Number(activity.beneficiaryCount) || 0
+
+        totals.newMuslims +=
+          Number(activity.newMuslimsCount) || 0
+
+        return totals
+      },
+      {
+        activities: 0,
+        beneficiaries: 0,
+        newMuslims: 0,
+      }
+    )
 
   const handlePreview = () => {
     changeView('activity-preview')
@@ -565,7 +727,6 @@ function App() {
             <div className="preview-grid">
               <div className="preview-item">
                 <strong>اسم الداعية</strong>
-
                 <span>
                   {monthlyForm.preacherName || '—'}
                 </span>
@@ -573,7 +734,6 @@ function App() {
 
               <div className="preview-item">
                 <strong>الدولة</strong>
-
                 <span>
                   {monthlyForm.country || '—'}
                 </span>
@@ -581,7 +741,6 @@ function App() {
 
               <div className="preview-item preview-wide">
                 <strong>الشهر والسنة</strong>
-
                 <span>
                   {monthlyForm.month || '—'}
                 </span>
@@ -1058,7 +1217,7 @@ function App() {
                 </span>
               </div>
 
-              <div className="preview-item">
+              <div className="preview-item preview-wide">
                 <strong>
                   تاريخ النشاط
                 </strong>
@@ -1067,99 +1226,95 @@ function App() {
                   {formData.activityDate || '—'}
                 </span>
               </div>
+            </div>
 
+            <div className="weekly-preview-section-title">
+              <h2>
+                ملخص اليوم
+              </h2>
+            </div>
+
+            <div className="preview-grid">
               <div className="preview-item">
                 <strong>
-                  البرنامج
+                  إجمالي الأنشطة
                 </strong>
 
                 <span>
-                  {formData.program || '—'}
-                </span>
-              </div>
-
-              <div className="preview-item preview-wide">
-                <strong>
-                  عنوان النشاط
-                </strong>
-
-                <span>
-                  {formData.activityTitle || '—'}
-                </span>
-              </div>
-
-              <div className="preview-item preview-wide">
-                <strong>
-                  مكان تنفيذ النشاط
-                </strong>
-
-                <span>
-                  {formData.activityPlace || '—'}
+                  {activityTotals.activities}
                 </span>
               </div>
 
               <div className="preview-item">
                 <strong>
-                  المستفيدون
+                  إجمالي المستفيدين
                 </strong>
 
                 <span>
-                  {formData.beneficiaryType || '—'}
-                </span>
-              </div>
-
-              <div className="preview-item">
-                <strong>
-                  عدد المستفيدين
-                </strong>
-
-                <span>
-                  {formData.beneficiaryCount || '0'}
+                  {activityTotals.beneficiaries}
                 </span>
               </div>
 
               <div className="preview-item preview-wide">
                 <strong>
-                  عدد الداخلين في الإسلام
+                  إجمالي الداخلين في الإسلام
                 </strong>
 
                 <span>
-                  {formData.newMuslimsCount || '0'}
+                  {activityTotals.newMuslims}
                 </span>
               </div>
+            </div>
 
-              <div className="preview-item preview-wide">
-                <strong>
-                  وصف مختصر للنشاط
-                </strong>
+            <div className="weekly-preview-section-title">
+              <h2>
+                الأنشطة المنفذة خلال اليوم
+              </h2>
+            </div>
 
-                <span>
-                  {formData.description || '—'}
-                </span>
-              </div>
+            <div className="preview-grid">
+              {activityActivities.map(
+                (activity, index) => (
+                  <div
+                    className="preview-item preview-wide"
+                    key={index}
+                  >
+                    <strong>
+                      النشاط رقم {index + 1}
+                    </strong>
 
-              <div className="preview-item preview-wide">
-                <strong>
-                  أبرز النتائج
-                </strong>
+                    <span
+                      style={{
+                        whiteSpace: 'pre-line',
+                      }}
+                    >
+                      {`البرنامج: ${activity.program || '—'}
+عنوان النشاط: ${activity.activityTitle || '—'}
+مكان تنفيذ النشاط: ${activity.activityPlace || '—'}
+المستفيدون: ${activity.beneficiaryType || '—'}
+عدد المستفيدين: ${activity.beneficiaryCount || '0'}
+عدد الداخلين في الإسلام: ${activity.newMuslimsCount || '0'}
+وصف مختصر للنشاط: ${activity.description || '—'}
+أبرز النتائج: ${activity.results || '—'}`}
+                    </span>
+                  </div>
+                )
+              )}
+            </div>
 
-                <span>
-                  {formData.results || '—'}
-                </span>
-              </div>
-
-              {formData.notes && (
+            {formData.notes && (
+              <div className="preview-grid">
                 <div className="preview-item preview-wide">
                   <strong>
-                    ملاحظات
+                    ملاحظات عامة
                   </strong>
 
                   <span>
                     {formData.notes}
                   </span>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
 
             {images.length > 0 && (
               <div className="preview-images-section">
@@ -1247,7 +1402,7 @@ function App() {
             </h1>
 
             <p>
-              أدخل بيانات النشاط لإعداد التقرير
+              أدخل أنشطة اليوم لإعداد التقرير
             </p>
           </div>
 
@@ -1257,6 +1412,8 @@ function App() {
               event.preventDefault()
             }
           >
+            {/* البيانات الأساسية */}
+
             <div className="form-grid">
               <div className="form-field">
                 <label htmlFor="preacherName">
@@ -1314,158 +1471,288 @@ function App() {
                   onChange={handleChange}
                 />
               </div>
+            </div>
 
-              <div className="form-field form-field-wide">
-                <label htmlFor="program">
-                  البرنامج
-                </label>
+            {/* الأنشطة */}
 
-                <select
-                  id="program"
-                  name="program"
-                  value={formData.program}
-                  onChange={handleChange}
-                >
-                  <option value="">
-                    اختر البرنامج
-                  </option>
+            <div className="weekly-section">
+              <h2 className="weekly-section-title">
+                الأنشطة المنفذة خلال اليوم
+              </h2>
 
-                  {programs.map(
-                    (program) => (
-                      <option
-                        key={program}
-                        value={program}
-                      >
-                        {program}
-                      </option>
-                    )
-                  )}
-                </select>
+              {activityActivities.map(
+                (activity, index) => (
+                  <div
+                    className="weekly-activity-card"
+                    key={index}
+                  >
+                    <div className="weekly-activity-header">
+                      <strong>
+                        النشاط رقم {index + 1}
+                      </strong>
+
+                      {activityActivities.length >
+                        1 && (
+                        <button
+                          type="button"
+                          className="remove-activity-button"
+                          onClick={() =>
+                            removeActivity(index)
+                          }
+                        >
+                          حذف النشاط
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="form-grid">
+                      <div className="form-field form-field-wide">
+                        <label>
+                          البرنامج
+                        </label>
+
+                        <select
+                          value={activity.program}
+                          onChange={(event) =>
+                            handleActivityChange(
+                              index,
+                              'program',
+                              event.target.value
+                            )
+                          }
+                        >
+                          <option value="">
+                            اختر البرنامج
+                          </option>
+
+                          {programs.map(
+                            (program) => (
+                              <option
+                                key={program}
+                                value={program}
+                              >
+                                {program}
+                              </option>
+                            )
+                          )}
+                        </select>
+                      </div>
+
+                      <div className="form-field form-field-wide">
+                        <label>
+                          عنوان النشاط
+                        </label>
+
+                        <input
+                          type="text"
+                          value={
+                            activity.activityTitle
+                          }
+                          onChange={(event) =>
+                            handleActivityChange(
+                              index,
+                              'activityTitle',
+                              event.target.value
+                            )
+                          }
+                          placeholder="مثال: تعليم الأطفال صفة الصلاة"
+                        />
+                      </div>
+
+                      <div className="form-field form-field-wide">
+                        <label>
+                          مكان تنفيذ النشاط
+                        </label>
+
+                        <input
+                          type="text"
+                          value={
+                            activity.activityPlace
+                          }
+                          onChange={(event) =>
+                            handleActivityChange(
+                              index,
+                              'activityPlace',
+                              event.target.value
+                            )
+                          }
+                          placeholder="اكتب مكان تنفيذ النشاط"
+                        />
+                      </div>
+
+                      <div className="form-field">
+                        <label>
+                          المستفيدون
+                        </label>
+
+                        <select
+                          value={
+                            activity.beneficiaryType
+                          }
+                          onChange={(event) =>
+                            handleActivityChange(
+                              index,
+                              'beneficiaryType',
+                              event.target.value
+                            )
+                          }
+                        >
+                          <option value="">
+                            اختر فئة المستفيدين
+                          </option>
+
+                          {beneficiaryTypes.map(
+                            (type) => (
+                              <option
+                                key={type}
+                                value={type}
+                              >
+                                {type}
+                              </option>
+                            )
+                          )}
+                        </select>
+                      </div>
+
+                      <div className="form-field">
+                        <label>
+                          عدد المستفيدين
+                        </label>
+
+                        <input
+                          type="number"
+                          min="0"
+                          inputMode="numeric"
+                          value={
+                            activity.beneficiaryCount
+                          }
+                          onChange={(event) =>
+                            handleActivityChange(
+                              index,
+                              'beneficiaryCount',
+                              event.target.value
+                            )
+                          }
+                        />
+                      </div>
+
+                      <div className="form-field form-field-wide">
+                        <label>
+                          عدد الداخلين في الإسلام
+                        </label>
+
+                        <input
+                          type="number"
+                          min="0"
+                          inputMode="numeric"
+                          value={
+                            activity.newMuslimsCount
+                          }
+                          onChange={(event) =>
+                            handleActivityChange(
+                              index,
+                              'newMuslimsCount',
+                              event.target.value
+                            )
+                          }
+                        />
+                      </div>
+
+                      <div className="form-field form-field-wide">
+                        <label>
+                          وصف مختصر للنشاط
+                        </label>
+
+                        <textarea
+                          rows="4"
+                          value={
+                            activity.description
+                          }
+                          onChange={(event) =>
+                            handleActivityChange(
+                              index,
+                              'description',
+                              event.target.value
+                            )
+                          }
+                          placeholder="اكتب وصفًا مختصرًا لما تم في النشاط"
+                        />
+                      </div>
+
+                      <div className="form-field form-field-wide">
+                        <label>
+                          أبرز النتائج
+                        </label>
+
+                        <textarea
+                          rows="4"
+                          value={
+                            activity.results
+                          }
+                          onChange={(event) =>
+                            handleActivityChange(
+                              index,
+                              'results',
+                              event.target.value
+                            )
+                          }
+                          placeholder="اكتب أبرز النتائج التي تحققت"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )
+              )}
+
+              <button
+                type="button"
+                className="add-activity-button"
+                onClick={addActivity}
+              >
+                + إضافة نشاط آخر
+              </button>
+            </div>
+
+            {/* الإجماليات */}
+
+            <div className="weekly-totals">
+              <div className="weekly-total-card">
+                <strong>
+                  {activityTotals.activities}
+                </strong>
+
+                <span>
+                  إجمالي الأنشطة
+                </span>
               </div>
 
-              <div className="form-field form-field-wide">
-                <label htmlFor="activityTitle">
-                  عنوان النشاط
-                </label>
+              <div className="weekly-total-card">
+                <strong>
+                  {activityTotals.beneficiaries}
+                </strong>
 
-                <input
-                  id="activityTitle"
-                  name="activityTitle"
-                  type="text"
-                  value={formData.activityTitle}
-                  onChange={handleChange}
-                  placeholder="مثال: تعليم الأطفال صفة الصلاة"
-                />
+                <span>
+                  إجمالي المستفيدين
+                </span>
               </div>
 
-              <div className="form-field form-field-wide">
-                <label htmlFor="activityPlace">
-                  مكان تنفيذ النشاط
-                </label>
+              <div className="weekly-total-card">
+                <strong>
+                  {activityTotals.newMuslims}
+                </strong>
 
-                <input
-                  id="activityPlace"
-                  name="activityPlace"
-                  type="text"
-                  value={formData.activityPlace}
-                  onChange={handleChange}
-                  placeholder="اكتب مكان تنفيذ النشاط"
-                />
+                <span>
+                  إجمالي الداخلين في الإسلام
+                </span>
               </div>
+            </div>
 
-              <div className="form-field">
-                <label htmlFor="beneficiaryType">
-                  المستفيدون
-                </label>
+            {/* الملاحظات والصور */}
 
-                <select
-                  id="beneficiaryType"
-                  name="beneficiaryType"
-                  value={formData.beneficiaryType}
-                  onChange={handleChange}
-                >
-                  <option value="">
-                    اختر فئة المستفيدين
-                  </option>
-
-                  {beneficiaryTypes.map(
-                    (type) => (
-                      <option
-                        key={type}
-                        value={type}
-                      >
-                        {type}
-                      </option>
-                    )
-                  )}
-                </select>
-              </div>
-
-              <div className="form-field">
-                <label htmlFor="beneficiaryCount">
-                  عدد المستفيدين
-                </label>
-
-                <input
-                  id="beneficiaryCount"
-                  name="beneficiaryCount"
-                  type="number"
-                  min="0"
-                  inputMode="numeric"
-                  value={formData.beneficiaryCount}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="form-field form-field-wide">
-                <label htmlFor="newMuslimsCount">
-                  عدد الداخلين في الإسلام
-                </label>
-
-                <input
-                  id="newMuslimsCount"
-                  name="newMuslimsCount"
-                  type="number"
-                  min="0"
-                  inputMode="numeric"
-                  value={formData.newMuslimsCount}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="form-field form-field-wide">
-                <label htmlFor="description">
-                  وصف مختصر للنشاط
-                </label>
-
-                <textarea
-                  id="description"
-                  name="description"
-                  rows="4"
-                  value={formData.description}
-                  onChange={handleChange}
-                  placeholder="اكتب وصفًا مختصرًا لما تم في النشاط"
-                />
-              </div>
-
-              <div className="form-field form-field-wide">
-                <label htmlFor="results">
-                  أبرز النتائج
-                </label>
-
-                <textarea
-                  id="results"
-                  name="results"
-                  rows="4"
-                  value={formData.results}
-                  onChange={handleChange}
-                  placeholder="اكتب أبرز النتائج التي تحققت"
-                />
-              </div>
-
+            <div className="form-grid">
               <div className="form-field form-field-wide">
                 <label htmlFor="notes">
-                  ملاحظات
+                  ملاحظات عامة
 
                   <span className="optional-text">
                     {' '}— اختياري
@@ -1478,7 +1765,7 @@ function App() {
                   rows="3"
                   value={formData.notes}
                   onChange={handleChange}
-                  placeholder="أي ملاحظات إضافية"
+                  placeholder="أي ملاحظات إضافية على أنشطة اليوم"
                 />
               </div>
 
@@ -1496,7 +1783,7 @@ function App() {
                 />
 
                 <small className="field-hint">
-                  يمكنك اختيار عدة صور من الهاتف أو الجهاز
+                  يمكنك اختيار عدة صور مشتركة لأنشطة اليوم
                 </small>
 
                 {images.length > 0 && (
@@ -2410,7 +2697,7 @@ function App() {
             </strong>
 
             <small>
-              لتوثيق نشاط دعوي واحد
+              لتوثيق الأنشطة الدعوية خلال اليوم
             </small>
           </button>
 
